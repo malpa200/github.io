@@ -18,6 +18,13 @@
             color: #5e3023;
             font-size: 2.5em;
             text-shadow: 1px 1px 2px rgba(0,0,0,0.1);
+            margin-bottom: 10px;
+        }
+        .subtitle {
+            text-align: center;
+            color: #8b5a2b;
+            font-style: italic;
+            margin-bottom: 30px;
         }
         .container {
             background-color: rgba(255, 255, 255, 0.8);
@@ -31,6 +38,7 @@
             margin-bottom: 20px;
             border-radius: 5px;
             font-size: 14px;
+            font-weight: bold;
         }
         .status.connected {
             background-color: #d4edda;
@@ -59,6 +67,11 @@
             border-radius: 5px;
             font-family: 'Georgia', serif;
             font-size: 16px;
+        }
+        input[type="text"]:focus {
+            outline: none;
+            border-color: #8b5a2b;
+            box-shadow: 0 0 5px rgba(139, 90, 43, 0.3);
         }
         button {
             padding: 12px 18px;
@@ -111,6 +124,7 @@
         }
         li:hover {
             background-color: rgba(255, 255, 255, 0.8);
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
         }
         .completed {
             opacity: 0.7;
@@ -124,6 +138,7 @@
             flex: 1;
             margin-right: 15px;
             font-size: 16px;
+            word-wrap: break-word;
         }
         .task-meta {
             font-size: 12px;
@@ -133,6 +148,7 @@
         .task-buttons {
             display: flex;
             gap: 5px;
+            flex-shrink: 0;
         }
         .empty-state {
             text-align: center;
@@ -140,59 +156,65 @@
             font-style: italic;
             padding: 40px 20px;
         }
-        .setup-instructions {
-            background-color: #e7f3ff;
-            border: 1px solid #b6d7ff;
-            border-radius: 8px;
-            padding: 20px;
-            margin-bottom: 20px;
+        .stats {
+            text-align: center;
+            margin-top: 20px;
+            color: #666;
+            font-size: 14px;
         }
-        .setup-instructions h3 {
-            margin-top: 0;
-            color: #0056b3;
-        }
-        .setup-instructions ol {
-            padding-left: 20px;
-        }
-        .setup-instructions code {
-            background-color: #f8f9fa;
-            padding: 2px 6px;
-            border-radius: 3px;
-            font-family: monospace;
+        @media (max-width: 480px) {
+            .input-container {
+                flex-direction: column;
+            }
+            .task-buttons {
+                flex-direction: column;
+                gap: 3px;
+            }
+            li {
+                flex-direction: column;
+                align-items: flex-start;
+            }
+            .task-buttons {
+                align-self: flex-end;
+                margin-top: 10px;
+            }
         }
     </style>
 </head>
 <body>
+    <h1>📝 Il Mio Diario Condiviso</h1>
+    <p class="subtitle">Lista delle attività condivisa in tempo reale</p>
+    
+    <div class="container">
+        <div id="status" class="status loading">Caricamento...</div>
+        
+        <div class="input-container">
+            <input type="text" id="taskInput" placeholder="Aggiungi una nuova attività..." onkeypress="handleKeyPress(event)">
+            <button id="addBtn" onclick="addTask()">Aggiungi</button>
+        </div>
+        
+        <ul id="taskList">
+            <li class="empty-state">Caricamento delle attività...</li>
+        </ul>
+        
+        <div id="stats" class="stats"></div>
+    </div>
+
     <script>
-        // CONFIGURAZIONE - SOSTITUISCI CON IL TUO BIN ID
-        const BIN_ID = '68591a108561e97a502a0131'; // Sostituisci con il tuo Bin ID da JSONBin
+        // CONFIGURAZIONE JSONBin
+        const BIN_ID = '68591a108561e97a502a0131';
         const API_URL = `https://api.jsonbin.io/v3/b/${BIN_ID}`;
         
         let tasks = [];
-        let isConfigured = BIN_ID !== 'YOUR_BIN_ID_HERE';
-
-        // Nasconde le istruzioni di setup
-        function hideSetup() {
-            document.getElementById('setup-guide').style.display = 'none';
-            if (isConfigured) {
-                initApp();
-            } else {
-                updateStatus('Sostituisci BIN_ID nel codice con il tuo ID JSONBin!', 'error');
-            }
-        }
+        let lastUpdateTime = 0;
 
         // Inizializza l'app
         function initApp() {
-            if (!isConfigured) {
-                updateStatus('Configura JSONBin per iniziare', 'error');
-                return;
-            }
-            
             updateStatus('Connessione a JSONBin...', 'loading');
             loadTasks();
             
-            // Aggiorna ogni 10 secondi per vedere i cambiamenti degli altri utenti
-            setInterval(loadTasks, 10000);
+            // Aggiorna ogni 5 secondi per vedere i cambiamenti degli altri utenti
+            setInterval(loadTasks, 5000);
         }
 
         // Aggiorna lo stato
@@ -200,6 +222,20 @@
             const statusEl = document.getElementById('status');
             statusEl.textContent = message;
             statusEl.className = `status ${type}`;
+        }
+
+        // Aggiorna le statistiche
+        function updateStats() {
+            const totalTasks = tasks.length;
+            const completedTasks = tasks.filter(t => t.completed).length;
+            const pendingTasks = totalTasks - completedTasks;
+            
+            const statsEl = document.getElementById('stats');
+            if (totalTasks > 0) {
+                statsEl.textContent = `Totale: ${totalTasks} | Completate: ${completedTasks} | Da fare: ${pendingTasks}`;
+            } else {
+                statsEl.textContent = '';
+            }
         }
 
         // Gestisce il tasto Enter
@@ -211,17 +247,13 @@
 
         // Aggiunge una nuova attività
         async function addTask() {
-            if (!isConfigured) {
-                alert('Prima configura JSONBin!');
-                return;
-            }
-
             const taskInput = document.getElementById('taskInput');
             const addBtn = document.getElementById('addBtn');
             const taskText = taskInput.value.trim();
 
             if (taskText === '') {
                 alert('Per favore, inserisci un\'attività.');
+                taskInput.focus();
                 return;
             }
 
@@ -229,9 +261,12 @@
             addBtn.textContent = 'Aggiungendo...';
 
             try {
+                // Prima ricarica i task più recenti per evitare conflitti
+                await loadTasks(false);
+                
                 // Crea il nuovo task
                 const newTask = {
-                    id: Date.now(),
+                    id: Date.now() + Math.random(), // Evita collisioni di ID
                     text: taskText,
                     completed: false,
                     createdAt: new Date().toISOString()
@@ -246,7 +281,10 @@
                     headers: {
                         'Content-Type': 'application/json'
                     },
-                    body: JSON.stringify({ tasks: tasks })
+                    body: JSON.stringify({ 
+                        tasks: tasks,
+                        lastUpdate: Date.now()
+                    })
                 });
 
                 if (!response.ok) {
@@ -255,23 +293,23 @@
 
                 taskInput.value = '';
                 displayTasks();
-                updateStatus('Attività aggiunta!', 'connected');
+                updateStatus('✅ Attività aggiunta con successo!', 'connected');
 
             } catch (error) {
                 console.error('Errore aggiunta task:', error);
-                updateStatus('Errore nell\'aggiungere l\'attività', 'error');
+                updateStatus('❌ Errore nell\'aggiungere l\'attività', 'error');
                 // Rimuovi il task dalla lista locale se il salvataggio è fallito
                 tasks.pop();
+                displayTasks();
             } finally {
                 addBtn.disabled = false;
                 addBtn.textContent = 'Aggiungi';
+                taskInput.focus();
             }
         }
 
         // Carica le attività
-        async function loadTasks() {
-            if (!isConfigured) return;
-
+        async function loadTasks(showStatus = true) {
             try {
                 const response = await fetch(API_URL + '/latest');
                 
@@ -280,13 +318,26 @@
                 }
 
                 const data = await response.json();
-                tasks = data.record?.tasks || [];
-                displayTasks();
-                updateStatus(`✅ Connesso - ${tasks.length} attività`, 'connected');
+                const serverData = data.record || {};
+                const serverTasks = serverData.tasks || [];
+                const serverUpdateTime = serverData.lastUpdate || 0;
+                
+                // Aggiorna solo se i dati del server sono più recenti
+                if (serverUpdateTime > lastUpdateTime) {
+                    tasks = serverTasks;
+                    lastUpdateTime = serverUpdateTime;
+                    displayTasks();
+                }
+                
+                if (showStatus) {
+                    updateStatus(`✅ Connesso - ${tasks.length} attività`, 'connected');
+                }
 
             } catch (error) {
                 console.error('Errore caricamento:', error);
-                updateStatus('Errore nel caricamento delle attività', 'error');
+                if (showStatus) {
+                    updateStatus('❌ Errore nel caricamento delle attività', 'error');
+                }
             }
         }
 
@@ -295,14 +346,20 @@
             const taskList = document.getElementById('taskList');
             
             if (tasks.length === 0) {
-                taskList.innerHTML = '<li class="empty-state">Nessuna attività ancora. Aggiungi la prima!</li>';
+                taskList.innerHTML = '<li class="empty-state">🎯 Nessuna attività ancora. Aggiungi la prima!</li>';
+                updateStats();
                 return;
             }
 
             taskList.innerHTML = '';
             
-            // Ordina per data di creazione (più recenti prima)
-            const sortedTasks = [...tasks].sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
+            // Ordina: prima quelle non completate, poi per data di creazione (più recenti prima)
+            const sortedTasks = [...tasks].sort((a, b) => {
+                if (a.completed !== b.completed) {
+                    return a.completed ? 1 : -1;
+                }
+                return new Date(b.createdAt) - new Date(a.createdAt);
+            });
             
             sortedTasks.forEach(task => {
                 const li = document.createElement('li');
@@ -310,33 +367,45 @@
                     li.classList.add('completed');
                 }
                 
-                const createdDate = new Date(task.createdAt).toLocaleString('it-IT');
+                const createdDate = new Date(task.createdAt).toLocaleString('it-IT', {
+                    day: '2-digit',
+                    month: '2-digit',
+                    year: 'numeric',
+                    hour: '2-digit',
+                    minute: '2-digit'
+                });
                 
                 li.innerHTML = `
                     <div>
                         <div class="task-text">${escapeHtml(task.text)}</div>
-                        <div class="task-meta">Aggiunto il: ${createdDate}</div>
+                        <div class="task-meta">📅 Aggiunto il: ${createdDate}</div>
                     </div>
                     <div class="task-buttons">
-                        <button class="complete" onclick="toggleComplete(${task.id})">
-                            ${task.completed ? 'Ripristina' : 'Completa'}
+                        <button class="complete" onclick="toggleComplete('${task.id}')">
+                            ${task.completed ? '↩️ Ripristina' : '✅ Completa'}
                         </button>
-                        <button class="delete" onclick="deleteTask(${task.id})">
-                            Elimina
+                        <button class="delete" onclick="deleteTask('${task.id}')">
+                            🗑️ Elimina
                         </button>
                     </div>
                 `;
                 taskList.appendChild(li);
             });
+            
+            updateStats();
         }
 
         // Segna come completata/non completata
         async function toggleComplete(taskId) {
-            if (!isConfigured) return;
-
             try {
-                const taskIndex = tasks.findIndex(t => t.id === taskId);
-                if (taskIndex === -1) return;
+                // Prima ricarica per evitare conflitti
+                await loadTasks(false);
+                
+                const taskIndex = tasks.findIndex(t => t.id == taskId);
+                if (taskIndex === -1) {
+                    await loadTasks();
+                    return;
+                }
 
                 tasks[taskIndex].completed = !tasks[taskIndex].completed;
 
@@ -345,7 +414,10 @@
                     headers: {
                         'Content-Type': 'application/json'
                     },
-                    body: JSON.stringify({ tasks: tasks })
+                    body: JSON.stringify({ 
+                        tasks: tasks,
+                        lastUpdate: Date.now()
+                    })
                 });
 
                 if (!response.ok) {
@@ -353,29 +425,34 @@
                 }
 
                 displayTasks();
-                updateStatus('Attività aggiornata!', 'connected');
+                updateStatus('✅ Attività aggiornata!', 'connected');
 
             } catch (error) {
                 console.error('Errore aggiornamento:', error);
-                updateStatus('Errore nell\'aggiornare l\'attività', 'error');
+                updateStatus('❌ Errore nell\'aggiornare l\'attività', 'error');
                 loadTasks(); // Ricarica per ripristinare lo stato corretto
             }
         }
 
         // Elimina un'attività
         async function deleteTask(taskId) {
-            if (!confirm('Sei sicuro di voler eliminare questa attività?')) return;
-            if (!isConfigured) return;
+            if (!confirm('🗑️ Sei sicuro di voler eliminare questa attività?')) return;
 
             try {
-                tasks = tasks.filter(t => t.id !== taskId);
+                // Prima ricarica per evitare conflitti
+                await loadTasks(false);
+                
+                tasks = tasks.filter(t => t.id != taskId);
 
                 const response = await fetch(API_URL, {
                     method: 'PUT',
                     headers: {
                         'Content-Type': 'application/json'
                     },
-                    body: JSON.stringify({ tasks: tasks })
+                    body: JSON.stringify({ 
+                        tasks: tasks,
+                        lastUpdate: Date.now()
+                    })
                 });
 
                 if (!response.ok) {
@@ -383,11 +460,11 @@
                 }
 
                 displayTasks();
-                updateStatus('Attività eliminata!', 'connected');
+                updateStatus('✅ Attività eliminata!', 'connected');
 
             } catch (error) {
                 console.error('Errore eliminazione:', error);
-                updateStatus('Errore nell\'eliminare l\'attività', 'error');
+                updateStatus('❌ Errore nell\'eliminare l\'attività', 'error');
                 loadTasks(); // Ricarica per ripristinare lo stato corretto
             }
         }
@@ -400,11 +477,7 @@
         }
 
         // Inizializza quando la pagina è carica
-        window.onload = function() {
-            if (isConfigured) {
-                hideSetup();
-            }
-        };
+        window.onload = initApp;
     </script>
 </body>
 </html>
