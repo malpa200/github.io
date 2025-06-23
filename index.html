@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Le Nostre Avventure</title>
+    <title>Le Nostre Avventure ❤️</title>
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Caveat:wght@400;600;700&family=Inter:wght@300;400;500;600&display=swap');
         
@@ -335,7 +335,51 @@
             box-shadow: 0 6px 25px rgba(245, 101, 101, 0.3);
         }
         
-        .stats {
+        .icon-selector {
+            margin-bottom: 20px;
+        }
+        
+        .icon-label {
+            font-size: 16px;
+            font-weight: 600;
+            color: #4a5568;
+            margin-bottom: 12px;
+        }
+        
+        .icon-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(45px, 1fr));
+            gap: 8px;
+            margin-bottom: 20px;
+        }
+        
+        .icon-option {
+            width: 45px;
+            height: 45px;
+            border: 2px solid #e2e8f0;
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            font-size: 1.5em;
+            transition: all 0.2s ease;
+            background: white;
+        }
+        
+        .icon-option:hover {
+            transform: scale(1.1);
+            border-color: #667eea;
+            box-shadow: 0 4px 12px rgba(102, 126, 234, 0.2);
+        }
+        
+        .icon-option.selected {
+            border-color: #667eea;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            transform: scale(1.05);
+            box-shadow: 0 4px 15px rgba(102, 126, 234, 0.3);
+        }
             display: flex;
             justify-content: space-around;
             margin-bottom: 25px;
@@ -443,6 +487,35 @@
             </div>
             
             <div class="add-adventure-section">
+                <div class="icon-selector" id="iconSelector">
+                    <div class="icon-label">Scegli un'icona:</div>
+                    <div class="icon-grid">
+                        <div class="icon-option selected" data-icon="🏔️">🏔️</div>
+                        <div class="icon-option" data-icon="🏖️">🏖️</div>
+                        <div class="icon-option" data-icon="🎭">🎭</div>
+                        <div class="icon-option" data-icon="🍜">🍜</div>
+                        <div class="icon-option" data-icon="🎨">🎨</div>
+                        <div class="icon-option" data-icon="🎪">🎪</div>
+                        <div class="icon-option" data-icon="🏛️">🏛️</div>
+                        <div class="icon-option" data-icon="🌸">🌸</div>
+                        <div class="icon-option" data-icon="🎵">🎵</div>
+                        <div class="icon-option" data-icon="🍷">🍷</div>
+                        <div class="icon-option" data-icon="🎯">🎯</div>
+                        <div class="icon-option" data-icon="🛶">🛶</div>
+                        <div class="icon-option" data-icon="🎢">🎢</div>
+                        <div class="icon-option" data-icon="🌅">🌅</div>
+                        <div class="icon-option" data-icon="🏰">🏰</div>
+                        <div class="icon-option" data-icon="🎳">🎳</div>
+                        <div class="icon-option" data-icon="🍕">🍕</div>
+                        <div class="icon-option" data-icon="🌊">🌊</div>
+                        <div class="icon-option" data-icon="🎠">🎠</div>
+                        <div class="icon-option" data-icon="🎪">🎪</div>
+                        <div class="icon-option" data-icon="🌺">🌺</div>
+                        <div class="icon-option" data-icon="🎸">🎸</div>
+                        <div class="icon-option" data-icon="🚁">🚁</div>
+                        <div class="icon-option" data-icon="🎆">🎆</div>
+                    </div>
+                </div>
                 <input type="text" class="adventure-input" id="adventureInput" placeholder="Quale avventura vogliamo vivere insieme? 💕" maxlength="200">
                 <button class="add-btn" id="addBtn">✨ Aggiungi la nostra avventura</button>
             </div>
