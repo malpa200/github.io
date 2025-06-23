@@ -1,0 +1,148 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Diary To-Do List</title>
+    <style>
+        body {
+            font-family: 'Georgia', serif;
+            background-color: #f9f4e6;
+            max-width: 600px;
+            margin: 0 auto;
+            padding: 20px;
+            background-image: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="100" height="100" viewBox="0 0 100 100"><rect width="100" height="100" fill="none" stroke="%23d4a76a" stroke-width="1" opacity="0.3"/></svg>');
+        }
+        h1 {
+            text-align: center;
+            color: #5e3023;
+            font-size: 2.5em;
+            text-shadow: 1px 1px 2px rgba(0,0,0,0.1);
+        }
+        .container {
+            background-color: rgba(255, 255, 255, 0.8);
+            padding: 30px;
+            border-radius: 10px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+        }
+        input[type="text"] {
+            width: 70%;
+            padding: 12px;
+            border: 1px solid #d4a76a;
+            border-radius: 5px;
+            font-family: 'Georgia', serif;
+        }
+        button {
+            padding: 12px 18px;
+            background-color: #8b5a2b;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-family: 'Georgia', serif;
+            margin-left: 5px;
+        }
+        button:hover {
+            background-color: #6e481b;
+        }
+        ul {
+            list-style-type: none;
+            padding: 0;
+        }
+        li {
+            padding: 12px;
+            background-color: rgba(255, 255, 255, 0.6);
+            margin: 8px 0;
+            border-radius: 5px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-left: 4px solid #8b5a2b;
+        }
+        .completed span {
+            text-decoration: line-through;
+            color: #888;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Il Mio Diario</h1>
+        <div>
+            <input type="text" id="taskInput" placeholder="Scrivi una nuova attività...">
+            <button onclick="addTask()">Aggiungi</button>
+        </div>
+        <ul id="taskList"></ul>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const taskList = document.getElementById('taskList');
+            const tasks = JSON.parse(localStorage.getItem('tasks')) || [];
+
+            tasks.forEach((task, index) => {
+                addTaskToDOM(task.text, task.completed, index);
+            });
+        });
+
+        function addTaskToDOM(text, completed, index) {
+            const taskList = document.getElementById('taskList');
+            const li = document.createElement('li');
+            if (completed) {
+                li.classList.add('completed');
+            }
+            li.innerHTML = `
+                <span>${text}</span>
+                <div>
+                    <button onclick="toggleComplete(this)">Completa</button>
+                    <button onclick="deleteTask(this, ${index})">Elimina</button>
+                </div>
+            `;
+            taskList.appendChild(li);
+        }
+
+        function addTask() {
+            const taskInput = document.getElementById('taskInput');
+            const taskList = document.getElementById('taskList');
+
+            if (taskInput.value.trim() === '') {
+                alert('Per favore, inserisci un\'attività.');
+                return;
+            }
+
+            const tasks = JSON.parse(localStorage.getItem('tasks')) || [];
+            tasks.push({ text: taskInput.value, completed: false });
+            localStorage.setItem('tasks', JSON.stringify(tasks));
+
+            addTaskToDOM(taskInput.value, false, tasks.length - 1);
+            taskInput.value = '';
+        }
+
+        function toggleComplete(button) {
+            const li = button.closest('li');
+            li.classList.toggle('completed');
+
+            const tasks = JSON.parse(localStorage.getItem('tasks')) || [];
+            const index = Array.from(li.parentNode.children).indexOf(li);
+            tasks[index].completed = li.classList.contains('completed');
+            localStorage.setItem('tasks', JSON.stringify(tasks));
+        }
+
+        function deleteTask(button, index) {
+            const li = button.closest('li');
+            li.remove();
+
+            const tasks = JSON.parse(localStorage.getItem('tasks')) || [];
+            tasks.splice(index, 1);
+            localStorage.setItem('tasks', JSON.stringify(tasks));
+
+            // Re-render the list to update indices
+            const taskList = document.getElementById('taskList');
+            taskList.innerHTML = '';
+            tasks.forEach((task, idx) => {
+                addTaskToDOM(task.text, task.completed, idx);
+            });
+        }
+    </script>
+</body>
+</html>
