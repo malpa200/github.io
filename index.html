@@ -156,9 +156,11 @@
         </ul>
     </div>
 
-    <script type="module">
+    <!-- Carica Supabase dal CDN -->
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    
+    <script>
         // Configurazione Supabase
-        // SOSTITUISCI QUESTI VALORI CON I TUOI DATI SUPABASE
         const SUPABASE_URL = 'https://ctrflqsnywwqgicickqf.supabase.co';
         const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImN0cmZscXNueXd3cWdpY2lja3FmIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTA2NjcxNjMsImV4cCI6MjA2NjI0MzE2M30.LdXY1x-eTsutvEb_XDewvqKig_300BElSdrImk_NVUg';
 
@@ -168,17 +170,30 @@
         // Inizializza Supabase
         async function initSupabase() {
             try {
-                // Carica Supabase dal CDN
-                const { createClient } = await import('https://cdn.skypack.dev/@supabase/supabase-js');
-                supabase = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+                supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+                console.log('Supabase inizializzato:', supabase);
+                
+                // Test della connessione
+                const { data, error } = await supabase.from('tasks').select('count').limit(1);
+                
+                if (error) {
+                    console.error('Errore test connessione:', error);
+                    updateStatus(`Errore database: ${error.message}`, 'error');
+                    return;
+                }
                 
                 updateStatus('Connesso al database!', 'connected');
                 loadTasks();
                 
                 // Ascolta i cambiamenti in tempo reale
                 supabase
-                    .channel('tasks')
-                    .on('postgres_changes', { event: '*', schema: 'public', table: 'tasks' }, () => {
+                    .channel('tasks-channel')
+                    .on('postgres_changes', { 
+                        event: '*', 
+                        schema: 'public', 
+                        table: 'tasks' 
+                    }, (payload) => {
+                        console.log('Cambiamento ricevuto:', payload);
                         loadTasks();
                     })
                     .subscribe();
@@ -340,7 +355,18 @@
 
         // Inizializza l'app
         window.onload = function() {
-            initSupabase();
+            // Aspetta che Supabase sia caricato
+            if (window.supabase) {
+                initSupabase();
+            } else {
+                setTimeout(() => {
+                    if (window.supabase) {
+                        initSupabase();
+                    } else {
+                        updateStatus('Errore: Supabase non caricato.', 'error');
+                    }
+                }, 1000);
+            }
         };
     </script>
 </body>
