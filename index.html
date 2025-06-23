@@ -15,7 +15,7 @@
         
         body {
             font-family: 'Inter', sans-serif;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 50%, #f093fb 100%);
+            background: linear-gradient(135deg, #a8edea 0%, #fed6e3 50%, #d299c2 100%);
             background-size: 400% 400%;
             animation: gradientShift 15s ease infinite;
             min-height: 100vh;
@@ -35,17 +35,17 @@
             background: rgba(255, 255, 255, 0.95);
             backdrop-filter: blur(20px);
             border-radius: 25px;
-            box-shadow: 0 25px 80px rgba(0, 0, 0, 0.2);
+            box-shadow: 0 25px 80px rgba(0, 0, 0, 0.15);
             max-width: 700px;
             width: 100%;
             position: relative;
             overflow: hidden;
             margin-top: 20px;
-            border: 1px solid rgba(255, 255, 255, 0.3);
+            border: 1px solid rgba(255, 255, 255, 0.4);
         }
         
         .adventure-header {
-            background: linear-gradient(135deg, #ff9a9e 0%, #fecfef 50%, #fecfef 100%);
+            background: linear-gradient(135deg, #ffeef8 0%, #e8f4f8 50%, #f0e6ff 100%);
             padding: 40px 30px;
             text-align: center;
             position: relative;
@@ -83,63 +83,137 @@
         .adventure-title {
             font-family: 'Caveat', cursive;
             font-size: 2.8em;
-            color: #2d3748;
+            color: #4a5568;
             margin-bottom: 10px;
-            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.1);
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.08);
             font-weight: 700;
         }
         
         .adventure-subtitle {
             font-size: 1.1em;
-            color: #4a5568;
+            color: #6b7280;
             font-weight: 400;
-            opacity: 0.8;
+            opacity: 0.9;
         }
         
         .adventure-content {
             padding: 35px;
-            background: linear-gradient(180deg, #fafafa 0%, #f7fafc 100%);
+            background: linear-gradient(180deg, #fefefe 0%, #f8fafc 100%);
             min-height: 500px;
+        }
+        
+        .stats {
+            display: flex;
+            justify-content: space-around;
+            margin-bottom: 25px;
+            padding: 20px;
+            background: white;
+            border-radius: 15px;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.05);
+        }
+        
+        .stat-item {
+            text-align: center;
+        }
+        
+        .stat-number {
+            font-size: 2em;
+            font-weight: 700;
+            color: #8b5cf6;
+            font-family: 'Caveat', cursive;
+        }
+        
+        .stat-label {
+            font-size: 0.9em;
+            color: #9ca3af;
+            font-weight: 500;
         }
         
         .add-adventure-section {
             background: white;
             padding: 25px;
             border-radius: 20px;
-            box-shadow: 0 8px 30px rgba(0, 0, 0, 0.08);
+            box-shadow: 0 8px 30px rgba(0, 0, 0, 0.06);
             margin-bottom: 30px;
-            border: 2px solid #e2e8f0;
+            border: 2px solid #f3f4f6;
             transition: all 0.3s ease;
         }
         
         .add-adventure-section:hover {
             transform: translateY(-2px);
-            box-shadow: 0 12px 40px rgba(0, 0, 0, 0.12);
-            border-color: #667eea;
+            box-shadow: 0 12px 40px rgba(0, 0, 0, 0.08);
+            border-color: #c084fc;
+        }
+        
+        .icon-selector {
+            margin-bottom: 20px;
+        }
+        
+        .icon-label {
+            font-size: 16px;
+            font-weight: 600;
+            color: #6b7280;
+            margin-bottom: 12px;
+        }
+        
+        .icon-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(45px, 1fr));
+            gap: 8px;
+            margin-bottom: 20px;
+        }
+        
+        .icon-option {
+            width: 45px;
+            height: 45px;
+            border: 2px solid #e5e7eb;
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            font-size: 1.5em;
+            transition: all 0.2s ease;
+            background: white;
+        }
+        
+        .icon-option:hover {
+            transform: scale(1.1);
+            border-color: #a78bfa;
+            box-shadow: 0 4px 12px rgba(167, 139, 250, 0.2);
+        }
+        
+        .icon-option.selected {
+            border-color: #8b5cf6;
+            background: linear-gradient(135deg, #8b5cf6 0%, #a78bfa 100%);
+            color: white;
+            transform: scale(1.05);
+            box-shadow: 0 4px 15px rgba(139, 92, 246, 0.3);
         }
         
         .adventure-input {
             width: 100%;
             padding: 16px 20px;
-            border: 2px solid #e2e8f0;
+            border: 2px solid #e5e7eb;
             border-radius: 15px;
             font-size: 16px;
             outline: none;
             transition: all 0.3s ease;
-            background: #f8fafc;
+            background: #f9fafb;
             font-family: 'Inter', sans-serif;
             margin-bottom: 15px;
+            color: #374151;
         }
         
         .adventure-input:focus {
-            border-color: #667eea;
+            border-color: #8b5cf6;
             background: white;
-            box-shadow: 0 0 0 4px rgba(102, 126, 234, 0.1);
+            box-shadow: 0 0 0 4px rgba(139, 92, 246, 0.1);
             transform: translateY(-1px);
         }
         
         .add-btn {
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            background: linear-gradient(135deg, #8b5cf6 0%, #a78bfa 100%);
             color: white;
             border: none;
             padding: 14px 28px;
@@ -148,14 +222,14 @@
             font-size: 16px;
             font-weight: 600;
             transition: all 0.3s ease;
-            box-shadow: 0 6px 20px rgba(102, 126, 234, 0.3);
+            box-shadow: 0 6px 20px rgba(139, 92, 246, 0.3);
             width: 100%;
             font-family: 'Inter', sans-serif;
         }
         
         .add-btn:hover {
             transform: translateY(-3px);
-            box-shadow: 0 8px 25px rgba(102, 126, 234, 0.4);
+            box-shadow: 0 8px 25px rgba(139, 92, 246, 0.4);
         }
         
         .add-btn:active {
@@ -172,12 +246,12 @@
             background: linear-gradient(135deg, #fff 0%, #f8fafc 100%);
             padding: 25px;
             border-radius: 18px;
-            box-shadow: 0 5px 20px rgba(0, 0, 0, 0.08);
+            box-shadow: 0 5px 20px rgba(0, 0, 0, 0.06);
             display: flex;
             align-items: center;
             gap: 20px;
             transition: all 0.4s ease;
-            border-left: 5px solid #667eea;
+            border-left: 5px solid #a78bfa;
             position: relative;
             overflow: hidden;
         }
@@ -189,15 +263,15 @@
             left: 0;
             width: 100%;
             height: 100%;
-            background: linear-gradient(135deg, rgba(102, 126, 234, 0.05) 0%, rgba(247, 250, 252, 0.05) 100%);
+            background: linear-gradient(135deg, rgba(139, 92, 246, 0.03) 0%, rgba(248, 250, 252, 0.03) 100%);
             opacity: 0;
             transition: opacity 0.3s ease;
         }
         
         .adventure-item:hover {
             transform: translateY(-5px) scale(1.02);
-            box-shadow: 0 15px 40px rgba(0, 0, 0, 0.15);
-            border-left-color: #f093fb;
+            box-shadow: 0 15px 40px rgba(0, 0, 0, 0.1);
+            border-left-color: #ec4899;
         }
         
         .adventure-item:hover::before {
@@ -206,19 +280,19 @@
         
         .adventure-item.completed {
             opacity: 0.7;
-            border-left-color: #48bb78;
-            background: linear-gradient(135deg, #f0fff4 0%, #e6fffa 100%);
+            border-left-color: #34d399;
+            background: linear-gradient(135deg, #ecfdf5 0%, #d1fae5 100%);
         }
         
         .adventure-item.completed .adventure-text {
             text-decoration: line-through;
-            color: #4a5568;
+            color: #6b7280;
         }
         
         .adventure-checkbox {
             width: 28px;
             height: 28px;
-            border: 3px solid #e2e8f0;
+            border: 3px solid #e5e7eb;
             border-radius: 50%;
             cursor: pointer;
             display: flex;
@@ -230,14 +304,14 @@
         }
         
         .adventure-checkbox:hover {
-            border-color: #667eea;
+            border-color: #8b5cf6;
             transform: scale(1.15);
-            box-shadow: 0 0 0 4px rgba(102, 126, 234, 0.1);
+            box-shadow: 0 0 0 4px rgba(139, 92, 246, 0.1);
         }
         
         .adventure-checkbox.checked {
-            background: linear-gradient(135deg, #48bb78 0%, #38a169 100%);
-            border-color: #48bb78;
+            background: linear-gradient(135deg, #34d399 0%, #10b981 100%);
+            border-color: #34d399;
             color: white;
         }
         
@@ -256,13 +330,13 @@
         .adventure-text {
             flex: 1;
             font-size: 16px;
-            color: #2d3748;
+            color: #374151;
             line-height: 1.5;
             font-weight: 500;
         }
         
         .delete-btn {
-            background: linear-gradient(135deg, #fc8181 0%, #f56565 100%);
+            background: linear-gradient(135deg, #fb7185 0%, #f43f5e 100%);
             color: white;
             border: none;
             padding: 10px 16px;
@@ -278,13 +352,13 @@
         .delete-btn:hover {
             opacity: 1;
             transform: scale(1.08);
-            box-shadow: 0 4px 15px rgba(245, 101, 101, 0.3);
+            box-shadow: 0 4px 15px rgba(244, 63, 94, 0.3);
         }
         
         .empty-state {
             text-align: center;
             padding: 60px 20px;
-            color: #718096;
+            color: #9ca3af;
             font-size: 18px;
             font-weight: 300;
         }
@@ -305,7 +379,7 @@
         .loading {
             text-align: center;
             padding: 40px;
-            color: #667eea;
+            color: #8b5cf6;
             font-weight: 500;
             font-size: 18px;
         }
@@ -314,7 +388,7 @@
             position: fixed;
             top: 20px;
             right: 20px;
-            background: linear-gradient(135deg, #48bb78 0%, #38a169 100%);
+            background: linear-gradient(135deg, #34d399 0%, #10b981 100%);
             color: white;
             padding: 15px 25px;
             border-radius: 25px;
@@ -322,7 +396,7 @@
             transform: translateX(100%);
             transition: transform 0.4s ease;
             z-index: 1000;
-            box-shadow: 0 6px 25px rgba(72, 187, 120, 0.3);
+            box-shadow: 0 6px 25px rgba(52, 211, 153, 0.3);
             font-size: 14px;
         }
         
@@ -331,79 +405,8 @@
         }
         
         .status-message.error {
-            background: linear-gradient(135deg, #fc8181 0%, #f56565 100%);
-            box-shadow: 0 6px 25px rgba(245, 101, 101, 0.3);
-        }
-        
-        .icon-selector {
-            margin-bottom: 20px;
-        }
-        
-        .icon-label {
-            font-size: 16px;
-            font-weight: 600;
-            color: #4a5568;
-            margin-bottom: 12px;
-        }
-        
-        .icon-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(45px, 1fr));
-            gap: 8px;
-            margin-bottom: 20px;
-        }
-        
-        .icon-option {
-            width: 45px;
-            height: 45px;
-            border: 2px solid #e2e8f0;
-            border-radius: 12px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            cursor: pointer;
-            font-size: 1.5em;
-            transition: all 0.2s ease;
-            background: white;
-        }
-        
-        .icon-option:hover {
-            transform: scale(1.1);
-            border-color: #667eea;
-            box-shadow: 0 4px 12px rgba(102, 126, 234, 0.2);
-        }
-        
-        .icon-option.selected {
-            border-color: #667eea;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            color: white;
-            transform: scale(1.05);
-            box-shadow: 0 4px 15px rgba(102, 126, 234, 0.3);
-        }
-            display: flex;
-            justify-content: space-around;
-            margin-bottom: 25px;
-            padding: 20px;
-            background: white;
-            border-radius: 15px;
-            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.05);
-        }
-        
-        .stat-item {
-            text-align: center;
-        }
-        
-        .stat-number {
-            font-size: 2em;
-            font-weight: 700;
-            color: #667eea;
-            font-family: 'Caveat', cursive;
-        }
-        
-        .stat-label {
-            font-size: 0.9em;
-            color: #718096;
-            font-weight: 500;
+            background: linear-gradient(135deg, #fb7185 0%, #f43f5e 100%);
+            box-shadow: 0 6px 25px rgba(244, 63, 94, 0.3);
         }
         
         @media (max-width: 600px) {
@@ -461,6 +464,13 @@
                 transform: translateX(0);
             }
         }
+        
+        @keyframes fadeOut {
+            to {
+                opacity: 0;
+                transform: translateX(-100%) scale(0.8);
+            }
+        }
     </style>
 </head>
 <body>
@@ -509,11 +519,11 @@
                         <div class="icon-option" data-icon="🍕">🍕</div>
                         <div class="icon-option" data-icon="🌊">🌊</div>
                         <div class="icon-option" data-icon="🎠">🎠</div>
-                        <div class="icon-option" data-icon="🎪">🎪</div>
                         <div class="icon-option" data-icon="🌺">🌺</div>
                         <div class="icon-option" data-icon="🎸">🎸</div>
                         <div class="icon-option" data-icon="🚁">🚁</div>
                         <div class="icon-option" data-icon="🎆">🎆</div>
+                        <div class="icon-option" data-icon="🚂">🚂</div>
                     </div>
                 </div>
                 <input type="text" class="adventure-input" id="adventureInput" placeholder="Quale avventura vogliamo vivere insieme? 💕" maxlength="200">
@@ -535,8 +545,9 @@
                 this.binId = '68591a108561e97a502a0131';
                 this.baseUrl = 'https://api.jsonbin.io/v3/b';
                 this.adventures = [];
+                this.selectedIcon = '🏔️'; // Icona di default
                 
-                this.adventureIcons = ['🏔️', '🏖️', '🎭', '🍜', '🎨', '🎪', '🏛️', '🌸', '🎵', '🍷', '🎯', '🛶', '🎢', '🌅', '🏰', '🎳', '🍕', '🎪', '🌊', '🎨'];
+                this.adventureIcons = ['🏔️', '🏖️', '🎭', '🍜', '🎨', '🎪', '🏛️', '🌸', '🎵', '🍷', '🎯', '🛶', '🎢', '🌅', '🏰', '🎳', '🍕', '🌊', '🎠', '🌺', '🎸', '🚁', '🎆', '🚂'];
                 
                 this.initElements();
                 this.initEventListeners();
@@ -552,12 +563,25 @@
                 this.totalCount = document.getElementById('totalCount');
                 this.completedCount = document.getElementById('completedCount');
                 this.pendingCount = document.getElementById('pendingCount');
+                this.iconOptions = document.querySelectorAll('.icon-option');
             }
             
             initEventListeners() {
                 this.addBtn.addEventListener('click', () => this.addAdventure());
                 this.adventureInput.addEventListener('keypress', (e) => {
                     if (e.key === 'Enter') this.addAdventure();
+                });
+                
+                // Event listener per la selezione delle icone
+                this.iconOptions.forEach(option => {
+                    option.addEventListener('click', (e) => {
+                        // Rimuovi la classe selected da tutte le icone
+                        this.iconOptions.forEach(opt => opt.classList.remove('selected'));
+                        // Aggiungi la classe selected all'icona cliccata
+                        e.target.classList.add('selected');
+                        // Salva l'icona selezionata
+                        this.selectedIcon = e.target.dataset.icon;
+                    });
                 });
             }
             
@@ -617,7 +641,7 @@
                     text: text,
                     completed: false,
                     createdAt: new Date().toISOString(),
-                    icon: this.getRandomIcon()
+                    icon: this.selectedIcon // Usa l'icona selezionata
                 };
                 
                 this.adventures.unshift(adventure);
@@ -625,10 +649,6 @@
                 this.renderAdventures();
                 this.updateStats();
                 this.saveAdventures();
-            }
-            
-            getRandomIcon() {
-                return this.adventureIcons[Math.floor(Math.random() * this.adventureIcons.length)];
             }
             
             toggleAdventure(id) {
@@ -713,18 +733,6 @@
         
         // Avvia l'app
         const app = new AdventureApp();
-        
-        // Aggiungi stile per animazione fadeOut
-        const style = document.createElement('style');
-        style.textContent = `
-            @keyframes fadeOut {
-                to {
-                    opacity: 0;
-                    transform: translateX(-100%) scale(0.8);
-                }
-            }
-        `;
-        document.head.appendChild(style);
     </script>
 </body>
 </html>
