@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Diary To-Do List</title>
+    <title>Diary with Firebase</title>
     <style>
         body {
             font-family: 'Georgia', serif;
@@ -75,74 +75,84 @@
         <ul id="taskList"></ul>
     </div>
 
-    <script>
-        document.addEventListener('DOMContentLoaded', function() {
-            const taskList = document.getElementById('taskList');
-            const tasks = JSON.parse(localStorage.getItem('tasks')) || [];
+    <!-- Import Firebase SDK -->
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/11.9.1/firebase-app.js";
+        import { getDatabase, ref, push, onValue, update, remove } from "https://www.gstatic.com/firebasejs/11.9.1/firebase-database.js";
 
-            tasks.forEach((task, index) => {
-                addTaskToDOM(task.text, task.completed, index);
-            });
-        });
+        // Configura Firebase
+        const firebaseConfig = {
+            apiKey: "AIzaSyDyFrkeMsx07xiTbj2j7p5_x96weDlhiQ8",
+            authDomain: "malpa200.firebaseapp.com",
+            projectId: "malpa200",
+            storageBucket: "malpa200.appspot.com",
+            messagingSenderId: "419997717450",
+            appId: "1:419997717450:web:a31dfc8e49c0608523b533"
+        };
 
-        function addTaskToDOM(text, completed, index) {
-            const taskList = document.getElementById('taskList');
-            const li = document.createElement('li');
-            if (completed) {
-                li.classList.add('completed');
-            }
-            li.innerHTML = `
-                <span>${text}</span>
-                <div>
-                    <button onclick="toggleComplete(this)">Completa</button>
-                    <button onclick="deleteTask(this, ${index})">Elimina</button>
-                </div>
-            `;
-            taskList.appendChild(li);
-        }
+        // Inizializza Firebase
+        const app = initializeApp(firebaseConfig);
+        const database = getDatabase(app);
+        const tasksRef = ref(database, 'tasks');
 
-        function addTask() {
+        // Funzione per aggiungere un'attività
+        window.addTask = function() {
             const taskInput = document.getElementById('taskInput');
-            const taskList = document.getElementById('taskList');
+            const taskText = taskInput.value.trim();
 
-            if (taskInput.value.trim() === '') {
+            if (taskText === '') {
                 alert('Per favore, inserisci un\'attività.');
                 return;
             }
 
-            const tasks = JSON.parse(localStorage.getItem('tasks')) || [];
-            tasks.push({ text: taskInput.value, completed: false });
-            localStorage.setItem('tasks', JSON.stringify(tasks));
+            push(tasksRef, {
+                text: taskText,
+                completed: false
+            });
 
-            addTaskToDOM(taskInput.value, false, tasks.length - 1);
             taskInput.value = '';
-        }
+        };
 
-        function toggleComplete(button) {
-            const li = button.closest('li');
-            li.classList.toggle('completed');
-
-            const tasks = JSON.parse(localStorage.getItem('tasks')) || [];
-            const index = Array.from(li.parentNode.children).indexOf(li);
-            tasks[index].completed = li.classList.contains('completed');
-            localStorage.setItem('tasks', JSON.stringify(tasks));
-        }
-
-        function deleteTask(button, index) {
-            const li = button.closest('li');
-            li.remove();
-
-            const tasks = JSON.parse(localStorage.getItem('tasks')) || [];
-            tasks.splice(index, 1);
-            localStorage.setItem('tasks', JSON.stringify(tasks));
-
-            // Re-render the list to update indices
+        // Funzione per caricare le attività dal database
+        function loadTasks() {
             const taskList = document.getElementById('taskList');
-            taskList.innerHTML = '';
-            tasks.forEach((task, idx) => {
-                addTaskToDOM(task.text, task.completed, idx);
+
+            onValue(tasksRef, (snapshot) => {
+                taskList.innerHTML = '';
+                snapshot.forEach((childSnapshot) => {
+                    const task = childSnapshot.val();
+                    const taskId = childSnapshot.key;
+
+                    const li = document.createElement('li');
+                    if (task.completed) {
+                        li.classList.add('completed');
+                    }
+                    li.innerHTML = `
+                        <span>${task.text}</span>
+                        <div>
+                            <button onclick="toggleComplete('${taskId}', ${task.completed})">Completa</button>
+                            <button onclick="deleteTask('${taskId}')">Elimina</button>
+                        </div>
+                    `;
+                    taskList.appendChild(li);
+                });
             });
         }
+
+        // Funzione per contrassegnare un'attività come completata
+        window.toggleComplete = function(taskId, completed) {
+            update(ref(database, `tasks/${taskId}`), {
+                completed: !completed
+            });
+        };
+
+        // Funzione per eliminare un'attività
+        window.deleteTask = function(taskId) {
+            remove(ref(database, `tasks/${taskId}`));
+        };
+
+        // Carica le attività quando la pagina viene caricata
+        window.onload = loadTasks;
     </script>
 </body>
 </html>
