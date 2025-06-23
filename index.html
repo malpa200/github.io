@@ -287,6 +287,19 @@
         .adventure-item.completed .adventure-text {
             text-decoration: line-through;
             color: #6b7280;
+            position: relative;
+        }
+        
+        .adventure-item.completed .adventure-text::after {
+            content: '';
+            position: absolute;
+            top: 50%;
+            left: 0;
+            right: 0;
+            height: 2px;
+            background: linear-gradient(135deg, #34d399 0%, #10b981 100%);
+            transform: translateY(-50%);
+            border-radius: 1px;
         }
         
         .adventure-checkbox {
@@ -335,6 +348,36 @@
             font-weight: 500;
         }
         
+        .action-buttons {
+            display: flex;
+            gap: 10px;
+            flex-shrink: 0;
+        }
+        
+        .complete-btn {
+            background: linear-gradient(135deg, #34d399 0%, #10b981 100%);
+            color: white;
+            border: none;
+            padding: 10px 16px;
+            border-radius: 20px;
+            cursor: pointer;
+            font-size: 14px;
+            transition: all 0.3s ease;
+            opacity: 0.8;
+            font-weight: 500;
+        }
+        
+        .complete-btn:hover {
+            opacity: 1;
+            transform: scale(1.08);
+            box-shadow: 0 4px 15px rgba(52, 211, 153, 0.3);
+        }
+        
+        .complete-btn.completed {
+            background: linear-gradient(135deg, #fbbf24 0%, #f59e0b 100%);
+            box-shadow: 0 4px 15px rgba(251, 191, 36, 0.3);
+        }
+        
         .delete-btn {
             background: linear-gradient(135deg, #fb7185 0%, #f43f5e 100%);
             color: white;
@@ -346,7 +389,6 @@
             transition: all 0.3s ease;
             opacity: 0.8;
             font-weight: 500;
-            flex-shrink: 0;
         }
         
         .delete-btn:hover {
@@ -705,9 +747,15 @@
                              onclick="app.toggleAdventure(${adventure.id})"></div>
                         <span class="adventure-icon">${adventure.icon}</span>
                         <span class="adventure-text">${this.escapeHtml(adventure.text)}</span>
-                        <button class="delete-btn" onclick="app.deleteAdventure(${adventure.id})">
-                            Rimuovi
-                        </button>
+                        <div class="action-buttons">
+                            <button class="complete-btn ${adventure.completed ? 'completed' : ''}" 
+                                    onclick="app.toggleAdventure(${adventure.id})">
+                                ${adventure.completed ? 'Annulla' : 'Completata'}
+                            </button>
+                            <button class="delete-btn" onclick="app.deleteAdventure(${adventure.id})">
+                                Rimuovi
+                            </button>
+                        </div>
                     </li>
                 `).join('');
             }
