@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Diary with Firebase</title>
+    <title>Il Mio Diario Condiviso</title>
     <style>
         body {
             font-family: 'Georgia', serif;
@@ -25,12 +25,35 @@
             border-radius: 10px;
             box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
         }
+        .status {
+            text-align: center;
+            padding: 10px;
+            margin-bottom: 20px;
+            border-radius: 5px;
+            font-size: 14px;
+        }
+        .status.connected {
+            background-color: #d4edda;
+            color: #155724;
+            border: 1px solid #c3e6cb;
+        }
+        .status.error {
+            background-color: #f8d7da;
+            color: #721c24;
+            border: 1px solid #f5c6cb;
+        }
+        .input-container {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 20px;
+        }
         input[type="text"] {
-            width: 70%;
+            flex: 1;
             padding: 12px;
             border: 1px solid #d4a76a;
             border-radius: 5px;
             font-family: 'Georgia', serif;
+            font-size: 16px;
         }
         button {
             padding: 12px 18px;
@@ -40,65 +63,150 @@
             border-radius: 5px;
             cursor: pointer;
             font-family: 'Georgia', serif;
-            margin-left: 5px;
+            font-size: 14px;
+            transition: background-color 0.3s;
         }
         button:hover {
             background-color: #6e481b;
+        }
+        button:disabled {
+            background-color: #ccc;
+            cursor: not-allowed;
+        }
+        button.complete {
+            background-color: #4a7c59;
+            font-size: 12px;
+            padding: 8px 12px;
+        }
+        button.complete:hover {
+            background-color: #2d4a36;
+        }
+        button.delete {
+            background-color: #c44a4a;
+            font-size: 12px;
+            padding: 8px 12px;
+        }
+        button.delete:hover {
+            background-color: #a33c3c;
         }
         ul {
             list-style-type: none;
             padding: 0;
         }
         li {
-            padding: 12px;
+            padding: 15px;
             background-color: rgba(255, 255, 255, 0.6);
-            margin: 8px 0;
+            margin: 10px 0;
             border-radius: 5px;
             display: flex;
             justify-content: space-between;
             align-items: center;
             border-left: 4px solid #8b5a2b;
+            transition: all 0.3s ease;
         }
-        .completed span {
+        li:hover {
+            background-color: rgba(255, 255, 255, 0.8);
+        }
+        .completed {
+            opacity: 0.7;
+            border-left-color: #4a7c59;
+        }
+        .completed .task-text {
             text-decoration: line-through;
             color: #888;
+        }
+        .task-text {
+            flex: 1;
+            margin-right: 15px;
+            font-size: 16px;
+        }
+        .task-meta {
+            font-size: 12px;
+            color: #666;
+            margin-top: 5px;
+        }
+        .task-buttons {
+            display: flex;
+            gap: 5px;
+        }
+        .empty-state {
+            text-align: center;
+            color: #8b5a2b;
+            font-style: italic;
+            padding: 40px 20px;
+        }
+        .loading {
+            text-align: center;
+            color: #8b5a2b;
+            padding: 20px;
         }
     </style>
 </head>
 <body>
     <div class="container">
-        <h1>Il Mio Diario</h1>
-        <div>
-            <input type="text" id="taskInput" placeholder="Scrivi una nuova attività...">
-            <button onclick="addTask()">Aggiungi</button>
+        <h1>Il Mio Diario Condiviso</h1>
+        <div id="status" class="status">Connessione in corso...</div>
+        
+        <div class="input-container">
+            <input type="text" id="taskInput" placeholder="Scrivi una nuova attività..." onkeypress="handleKeyPress(event)">
+            <button id="addBtn" onclick="addTask()">Aggiungi</button>
         </div>
-        <ul id="taskList"></ul>
+        <ul id="taskList">
+            <li class="loading">Caricamento attività...</li>
+        </ul>
     </div>
 
-    <!-- Import Firebase SDK -->
     <script type="module">
-        import { initializeApp } from "https://www.gstatic.com/firebasejs/11.9.1/firebase-app.js";
-        import { getDatabase, ref, push, onValue, update, remove } from "https://www.gstatic.com/firebasejs/11.9.1/firebase-database.js";
+        // Configurazione Supabase
+        // SOSTITUISCI QUESTI VALORI CON I TUOI DATI SUPABASE
+        const SUPABASE_URL = 'https://ctrflqsnywwqgicickqf.supabase.co';
+        const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImN0cmZscXNueXd3cWdpY2lja3FmIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTA2NjcxNjMsImV4cCI6MjA2NjI0MzE2M30.LdXY1x-eTsutvEb_XDewvqKig_300BElSdrImk_NVUg';
 
-        // Configura Firebase
-        const firebaseConfig = {
-            apiKey: "AIzaSyDyFrkeMsx07xiTbj2j7p5_x96weDlhiQ8",
-            authDomain: "malpa200.firebaseapp.com",
-            projectId: "malpa200",
-            storageBucket: "malpa200.appspot.com",
-            databaseURL: "https://malpa200-default-rtdb.europe-west1.firebasedatabase.app",
-            messagingSenderId: "419997717450",
-            appId: "1:419997717450:web:a31dfc8e49c0608523b533"
-        };
+        let supabase = null;
+        let tasks = [];
 
-        // Inizializza Firebase
-        const app = initializeApp(firebaseConfig);
-        const database = getDatabase(app);
-        const tasksRef = ref(database, 'tasks');
+        // Inizializza Supabase
+        async function initSupabase() {
+            try {
+                // Carica Supabase dal CDN
+                const { createClient } = await import('https://cdn.skypack.dev/@supabase/supabase-js');
+                supabase = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+                
+                updateStatus('Connesso al database!', 'connected');
+                loadTasks();
+                
+                // Ascolta i cambiamenti in tempo reale
+                supabase
+                    .channel('tasks')
+                    .on('postgres_changes', { event: '*', schema: 'public', table: 'tasks' }, () => {
+                        loadTasks();
+                    })
+                    .subscribe();
+                    
+            } catch (error) {
+                console.error('Errore inizializzazione Supabase:', error);
+                updateStatus('Errore di connessione. Controlla la configurazione.', 'error');
+            }
+        }
 
-        // Funzione per aggiungere un'attività
-        window.addTask = function() {
+        // Aggiorna lo stato della connessione
+        function updateStatus(message, type) {
+            const statusEl = document.getElementById('status');
+            statusEl.textContent = message;
+            statusEl.className = `status ${type}`;
+        }
+
+        // Gestisce il tasto Enter
+        function handleKeyPress(event) {
+            if (event.key === 'Enter') {
+                addTask();
+            }
+        }
+
+        // Aggiunge una nuova attività
+        window.addTask = async function() {
             const taskInput = document.getElementById('taskInput');
+            const addBtn = document.getElementById('addBtn');
             const taskText = taskInput.value.trim();
 
             if (taskText === '') {
@@ -106,54 +214,134 @@
                 return;
             }
 
-            push(tasksRef, {
-                text: taskText,
-                completed: false
-            });
+            if (!supabase) {
+                alert('Database non connesso. Riprova tra poco.');
+                return;
+            }
 
-            taskInput.value = '';
+            // Disabilita il pulsante durante l'invio
+            addBtn.disabled = true;
+            addBtn.textContent = 'Aggiungendo...';
+
+            try {
+                const { error } = await supabase
+                    .from('tasks')
+                    .insert([
+                        {
+                            text: taskText,
+                            completed: false,
+                            created_at: new Date().toISOString()
+                        }
+                    ]);
+
+                if (error) throw error;
+
+                taskInput.value = '';
+            } catch (error) {
+                console.error('Errore aggiunta task:', error);
+                alert('Errore nell\'aggiungere l\'attività. Riprova.');
+            } finally {
+                addBtn.disabled = false;
+                addBtn.textContent = 'Aggiungi';
+            }
         };
 
-        // Funzione per caricare le attività dal database
-        function loadTasks() {
+        // Carica le attività dal database
+        async function loadTasks() {
+            if (!supabase) return;
+
+            try {
+                const { data, error } = await supabase
+                    .from('tasks')
+                    .select('*')
+                    .order('created_at', { ascending: false });
+
+                if (error) throw error;
+
+                tasks = data || [];
+                displayTasks();
+            } catch (error) {
+                console.error('Errore caricamento tasks:', error);
+                updateStatus('Errore nel caricamento delle attività.', 'error');
+            }
+        }
+
+        // Visualizza le attività
+        function displayTasks() {
             const taskList = document.getElementById('taskList');
+            
+            if (tasks.length === 0) {
+                taskList.innerHTML = '<li class="empty-state">Nessuna attività ancora. Aggiungi la prima!</li>';
+                return;
+            }
 
-            onValue(tasksRef, (snapshot) => {
-                taskList.innerHTML = '';
-                snapshot.forEach((childSnapshot) => {
-                    const task = childSnapshot.val();
-                    const taskId = childSnapshot.key;
-
-                    const li = document.createElement('li');
-                    if (task.completed) {
-                        li.classList.add('completed');
-                    }
-                    li.innerHTML = `
-                        <span>${task.text}</span>
-                        <div>
-                            <button onclick="toggleComplete('${taskId}', ${task.completed})">Completa</button>
-                            <button onclick="deleteTask('${taskId}')">Elimina</button>
-                        </div>
-                    `;
-                    taskList.appendChild(li);
-                });
+            taskList.innerHTML = '';
+            
+            tasks.forEach(task => {
+                const li = document.createElement('li');
+                if (task.completed) {
+                    li.classList.add('completed');
+                }
+                
+                const createdDate = new Date(task.created_at).toLocaleString('it-IT');
+                
+                li.innerHTML = `
+                    <div>
+                        <div class="task-text">${task.text}</div>
+                        <div class="task-meta">Aggiunto il: ${createdDate}</div>
+                    </div>
+                    <div class="task-buttons">
+                        <button class="complete" onclick="toggleComplete(${task.id}, ${task.completed})">
+                            ${task.completed ? 'Ripristina' : 'Completa'}
+                        </button>
+                        <button class="delete" onclick="deleteTask(${task.id})">
+                            Elimina
+                        </button>
+                    </div>
+                `;
+                taskList.appendChild(li);
             });
         }
 
-        // Funzione per contrassegnare un'attività come completata
-        window.toggleComplete = function(taskId, completed) {
-            update(ref(database, `tasks/${taskId}`), {
-                completed: !completed
-            });
+        // Segna come completata/non completata
+        window.toggleComplete = async function(taskId, currentCompleted) {
+            if (!supabase) return;
+
+            try {
+                const { error } = await supabase
+                    .from('tasks')
+                    .update({ completed: !currentCompleted })
+                    .eq('id', taskId);
+
+                if (error) throw error;
+            } catch (error) {
+                console.error('Errore aggiornamento task:', error);
+                alert('Errore nell\'aggiornare l\'attività.');
+            }
         };
 
-        // Funzione per eliminare un'attività
-        window.deleteTask = function(taskId) {
-            remove(ref(database, `tasks/${taskId}`));
+        // Elimina un'attività
+        window.deleteTask = async function(taskId) {
+            if (!confirm('Sei sicuro di voler eliminare questa attività?')) return;
+            if (!supabase) return;
+
+            try {
+                const { error } = await supabase
+                    .from('tasks')
+                    .delete()
+                    .eq('id', taskId);
+
+                if (error) throw error;
+            } catch (error) {
+                console.error('Errore eliminazione task:', error);
+                alert('Errore nell\'eliminare l\'attività.');
+            }
         };
 
-        // Carica le attività quando la pagina viene caricata
-        window.onload = loadTasks;
+        // Inizializza l'app
+        window.onload = function() {
+            initSupabase();
+        };
     </script>
 </body>
 </html>
