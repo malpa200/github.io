@@ -203,6 +203,7 @@
     <script>
         // CONFIGURAZIONE JSONBin
         const BIN_ID = '68591a108561e97a502a0131';
+        const API_KEY = '$2a$10$6yIJtPBXi22/bgEfzPh0EOif3MyIWNRSNQei7EyXbFuFxxzf3tAVa'; // Sostituisci con la tua API Key di JSONBin
         const API_URL = `https://api.jsonbin.io/v3/b/${BIN_ID}`;
         
         let tasks = [];
@@ -210,6 +211,11 @@
 
         // Inizializza l'app
         function initApp() {
+            if (API_KEY === 'TUA_API_KEY_QUI') {
+                updateStatus('❌ Configura la tua API Key di JSONBin!', 'error');
+                return;
+            }
+            
             updateStatus('Connessione a JSONBin...', 'loading');
             loadTasks();
             
@@ -257,6 +263,11 @@
                 return;
             }
 
+            if (API_KEY === 'TUA_API_KEY_QUI') {
+                alert('Configura prima la tua API Key di JSONBin!');
+                return;
+            }
+
             addBtn.disabled = true;
             addBtn.textContent = 'Aggiungendo...';
 
@@ -279,7 +290,8 @@
                 const response = await fetch(API_URL, {
                     method: 'PUT',
                     headers: {
-                        'Content-Type': 'application/json'
+                        'Content-Type': 'application/json',
+                        'X-Master-Key': API_KEY
                     },
                     body: JSON.stringify({ 
                         tasks: tasks,
@@ -311,7 +323,11 @@
         // Carica le attività
         async function loadTasks(showStatus = true) {
             try {
-                const response = await fetch(API_URL + '/latest');
+                const response = await fetch(API_URL + '/latest', {
+                    headers: {
+                        'X-Master-Key': API_KEY
+                    }
+                });
                 
                 if (!response.ok) {
                     throw new Error(`Errore HTTP: ${response.status}`);
@@ -412,7 +428,8 @@
                 const response = await fetch(API_URL, {
                     method: 'PUT',
                     headers: {
-                        'Content-Type': 'application/json'
+                        'Content-Type': 'application/json',
+                        'X-Master-Key': API_KEY
                     },
                     body: JSON.stringify({ 
                         tasks: tasks,
@@ -447,7 +464,8 @@
                 const response = await fetch(API_URL, {
                     method: 'PUT',
                     headers: {
-                        'Content-Type': 'application/json'
+                        'Content-Type': 'application/json',
+                        'X-Master-Key': API_KEY
                     },
                     body: JSON.stringify({ 
                         tasks: tasks,
